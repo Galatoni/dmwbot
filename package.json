@@ -1,0 +1,11 @@
+{
+  "name": "DeadBotWalking",
+  "description": "A bot for discord",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "author": "Galatoni",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "winston": "^2.4.0"
+  }
+}

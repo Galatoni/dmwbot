@@ -1,0 +1,8 @@
+{
+    "token": "",
+    "serverID": "",
+    "features": {
+        "channelJoinNotification": true,
+        "voiceStateUpdates": true
+    }
+}
