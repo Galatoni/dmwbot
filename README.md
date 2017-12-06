@@ -7,7 +7,7 @@
 4. Decide which features you want activated by settings the corresponding flag in `config.json`:
 * `channelJoinNotification` - TTS notifications when anyone joins a text channel
 * `voiceStateUpdates` - TTS updates when a user joins a channel to the associated text channel
-5. Run node bot.js from the install server to start
+5. Run `node bot.js` from the install server to start
 
 ## Notes
 For now this is very much a work in progress, as such there are a few problems. They will likely be solved in future updates.
