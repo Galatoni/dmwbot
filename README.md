@@ -1,10 +1,13 @@
 # dmwbot
 
 ## Quickstart
-1. Enable an application and bot by following https://github.com/Chikachi/DiscordIntegration/wiki/How-to-get-a-token-and-channel-ID-for-Discord and filling in the settings in `config.json` for `token` and `serverID`
-2. Decide which features you want activated:
+1. Ensure you have node installed
+2. From the install directory run `npm install`
+3. Enable an application and bot by following https://github.com/Chikachi/DiscordIntegration/wiki/How-to-get-a-token-and-channel-ID-for-Discord and filling in the settings in `config.json` for `token` and `serverID`
+4. Decide which features you want activated by settings the corresponding flag in `config.json`:
 * `channelJoinNotification` - TTS notifications when anyone joins a text channel
 * `voiceStateUpdates` - TTS updates when a user joins a channel to the associated text channel
+5. Run node bot.js from the install server to start
 
 ## Notes
 For now this is very much a work in progress, as such there are a few problems. They will likely be solved in future updates, but for now, this is where we are.
