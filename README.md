@@ -10,7 +10,7 @@
 5. Run node bot.js from the install server to start
 
 ## Notes
-For now this is very much a work in progress, as such there are a few problems. They will likely be solved in future updates, but for now, this is where we are.
+For now this is very much a work in progress, as such there are a few problems. They will likely be solved in future updates.
 1. `voiceStateUpdates` map a voice channel name to a similarly named text channel. The required format is as follows:
 
 Voice channel: `NAME OF CHANNEL - Voice` maps and sends TTS notifications to text channel: `name_of_channel_text`. This is to get over limitations in channel state reporting in discord
