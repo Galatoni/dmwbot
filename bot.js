@@ -1,6 +1,7 @@
 var Discord = require('discord.io');
 var logger = require('winston');
 var config = require('./config.json');
+var fs = require('fs');
 
 // CHANNEL MAP UTILITY CLASS
 var ChannelMap = function(channels) {
@@ -56,6 +57,22 @@ var generateJoinMessage = function(author) {
     var template = '%s has joined the channel';
     return template.replace('%s', author.username);
 };
+
+//Pre-flight Checks
+var preflight = true;
+if (config.token === '') {
+    preflight = false;
+    logger.error('No token in config');
+}
+
+if (config.serverID === '') {
+    preflight = false;
+    logger.error('No serverID in config')
+}
+
+if (!preflight) {
+    logger.error('Please resolve config error before continuing.');
+}
 
 logger.level = 'debug';
 // Initialize Discord Bot
