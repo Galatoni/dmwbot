@@ -3,76 +3,43 @@ var logger = require('winston');
 var config = require('./config.json');
 var fs = require('fs');
 
-// CHANNEL MAP UTILITY CLASS
-var ChannelMap = function(channels) {
-    this.TEXT_EXTENSION = 'text';
-    this.VOICE_EXTENSION = '-_Voice';
-
-    this.channels = channels;
-
-    ChannelMap.prototype.getIdForChannelName = function(name) {
-        var id = false;
-
-        Object.keys(this.channels).map(function(key) {
-            if (this.channels[key].name === name) {
-                id = this.channels[key].id;
-            }
-        }, this);
-
-        return id;
-    };
-
-    ChannelMap.prototype.getNameForChannelId = function(id) {
-        var name = false;
-
-        Object.keys(this.channels).map(function(key) {
-            if (this.channels[key].id === id) {
-                name = this.channels[key].name
-            }
-        }, this);
-
-        return name;
-    };
-
-    ChannelMap.prototype.getTextChannelIdForVoiceChannelId = function(voiceChannelId) {
-        var voiceChannelName = this.getNameForChannelId(voiceChannelId);
-        return this.getIdForChannelName(this.convertVoiceChannelNameToTextChannelName(voiceChannelName));
-    };
-
-    ChannelMap.prototype.convertVoiceChannelNameToTextChannelName = function(voiceChannelName) {
-        return voiceChannelName.replace(/\s/g, '_')
-            .replace(this.VOICE_EXTENSION, this.TEXT_EXTENSION)
-            .toLowerCase();
-    };
-};
-//CHANNEL MAP UTILITY CLASS END
-
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
     colorize: true
 });
 
-var generateJoinMessage = function(author) {
-    var template = '%s has joined the channel';
-    return template.replace('%s', author.username);
-};
-
 //Pre-flight Checks
 var preflight = true;
-if (config.token === '') {
+if (!config.token || config.token === '') {
     preflight = false;
     logger.error('No token in config');
 }
 
-if (config.serverID === '') {
+if (!config.serverID || config.serverID === '') {
     preflight = false;
     logger.error('No serverID in config')
 }
 
-if (!preflight) {
-    logger.error('Please resolve config error before continuing.');
+if (config.features.voiceStateUpdates && config.sound_filename === '') {
+
+    if (config.sound_filename === '') {
+        preflight = false;
+        logger.error('sound_file name must be set if using voiceStateUpdates feature');
+    }
+
+    var soundFile = fs.readFileSync(config.sound_filename);
+    if (!soundFile) {
+        preflight = false;
+        logger.error('Unable to read sound file');
+    }
 }
+
+if (!preflight) {
+    logger.error('Please resolve config error(s) before continuing.');
+}
+
+//END Pre-flight
 
 logger.level = 'debug';
 // Initialize Discord Bot
@@ -85,43 +52,32 @@ bot.on('ready', function (evt) {
     logger.info('Connected');
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
-
-    logger.info('Processing channel information...');
-    this.channelMap = new ChannelMap(bot.channels);
     logger.info('Bot Ready');
 });
 
-var sendTTSMessage = function(textChannelId) {
-    bot.sendMessage({
-        to: textChannelId,
-        message: "User has joined your channel",
-        tts: true
-    });
-};
-
 if (config.features.voiceStateUpdates) {
     bot.on('voiceStateUpdate', function (evt) {
-        if (evt.d.channel_id) {
-            var textChannelId = this.channelMap.getTextChannelIdForVoiceChannelId(evt.d.channel_id);
+        var chanID = evt.d.channel_id;
+        if (chanID) {
+            bot.joinVoiceChannel(chanID, function() {
+                bot.getAudioContext(chanID, function(error, stream) {
+                    if (error) {
+                        logger.info('An error occurred when joining context');
+                        return;
+                    }
 
-            if (textChannelId) {
-                sendTTSMessage(textChannelId);
-            }
+                    fs.createReadStream(config.sound_filename).pipe(stream, {end: false});
+
+                    stream.on('done', function() {
+                        bot.leaveVoiceChannel(chanID)
+                    });
+                });
+            });
         }
     });
 }
 
 bot.on('message', function (user, userID, channelID, message, evt) {
-
-    // Listener for new entry messages - sends TTS response. Activated in config file.
-    var TYPE_USER_HAS_ENTERED_THE_GAME = 7;
-    if (config.features.channelJoinNotification && evt.d.type === TYPE_USER_HAS_ENTERED_THE_GAME) {
-        bot.sendMessage({
-            to: channelID,
-            message: generateJoinMessage(evt.d.author),
-            tts: true
-        });
-    }
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `!`
     if (message.substring(0, 1) == '!') {

@@ -1,8 +1,8 @@
 {
     "token": "",
     "serverID": "",
+    "sound_filename": "announcement.mp3",
     "features": {
-        "channelJoinNotification": true,
         "voiceStateUpdates": true
     }
 }
