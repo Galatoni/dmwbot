@@ -1,8 +1,13 @@
 {
-    "token": "",
-    "serverID": "",
-    "sound_filename": "announcement.mp3",
-    "features": {
-        "voiceStateUpdates": true
-    }
+  "token": "Mzg3Njg1NTQ5NjQyNzQzODA5.DQiD3A.",
+  "serverID": "",
+  "sound_filename": "announcement.mp3",
+  "command_reporting_text_room": "",
+  "rooms": [
+
+  ],
+  "features": {
+    "channelJoinNotification": true,
+    "voiceStateUpdates": true
+  }
 }
